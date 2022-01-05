@@ -7,7 +7,12 @@ export default class MyDocument extends Document {
     render() {
         return (
             <Html lang="en">
-                <Head></Head>
+                <Head>
+                    <link
+                        rel="stylesheet"
+                        href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+                    />
+                </Head>
                 <body>
                 <Main/>
                 <NextScript/>
@@ -17,7 +22,7 @@ export default class MyDocument extends Document {
     }
 }
 
-MyDocument.getInitialProps = async ctx => {
+MyDocument.getInitialProps = async (ctx) => {
     const serverSheets = new ServerStyleSheets();
     const originalRenderPage = ctx.renderPage;
     ctx.renderPage = () => {
