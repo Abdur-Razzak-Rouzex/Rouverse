@@ -25,7 +25,7 @@ const PostCard = ({post}) => {
                 }
 
                 title={post.fullName}
-                subheader={time.format("lll")}
+                subheader={time.format("lll") + ' (' +time.fromNow() + ')'}
             />
             <span>{}</span>
             <CardMedia

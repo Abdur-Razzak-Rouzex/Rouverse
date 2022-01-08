@@ -28,6 +28,19 @@ const useStyles = makeStyles({
     grow: {
         flexGrow: 1,
     },
+    form: {
+        maxWidth: 600,
+        margin: '0 auto'
+    },
+    login: {
+        fontSize: 40,
+        textAlign: "center",
+        marginTop: 20
+    },
+    navbarButton: {
+        color: '#ffffff',
+        textTransform: 'initial',
+    },
 })
 
 export default useStyles;
