@@ -6,6 +6,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import {useState} from "react";
 import {useSnackbar} from "notistack";
 import {useRouter} from "next/router";
+import Cookies from 'js-cookie';
 
 const Layout = ({children, title}) => {
     const router = useRouter();
@@ -22,9 +23,9 @@ const Layout = ({children, title}) => {
         setAnchorEl(null);
         /*dispatch({type: 'USER_LOGOUT'});*/
         Cookies.remove('userInfo');
-        Cookies.remove('cartItems');
+/*        Cookies.remove('cartItems');
         Cookies.remove('shippinhAddress');
-        Cookies.remove('paymentMethod');
+        Cookies.remove('paymentMethod');*/
         router.push('/');
     };
 
