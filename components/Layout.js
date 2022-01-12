@@ -7,25 +7,25 @@ import {useState} from "react";
 import {useSnackbar} from "notistack";
 import {useRouter} from "next/router";
 import Cookies from 'js-cookie';
+import {useDispatch, useSelector} from 'react-redux';
+import {loginUser, logoutUser} from "../redux";
 
 const Layout = ({children, title}) => {
     const router = useRouter();
     const classes = useStyles();
     const [notifications, setNotifications] = useState(0);
-    /*const {state, dispatch} = useContext(Store);
-    const {darkMode, cart, userInfo} = state;*/
-    const userInfo = {name: 'rouzex'};
+
+    const user = useSelector(state => state.user);
+    const dispatch = useDispatch();
+
     const {enqueueSnackbar} = useSnackbar();
 
     const [anchorEl, setAnchorEl] = useState(null);
 
     const logoutClickHandler = () => {
         setAnchorEl(null);
-        /*dispatch({type: 'USER_LOGOUT'});*/
-        Cookies.remove('userInfo');
-/*        Cookies.remove('cartItems');
-        Cookies.remove('shippinhAddress');
-        Cookies.remove('paymentMethod');*/
+        dispatch(logoutUser());
+        Cookies.remove('user.userInfo');
         router.push('/');
     };
 
@@ -58,7 +58,7 @@ const Layout = ({children, title}) => {
                             <NotificationsIcon/>
                         )}
                     </Typography>
-                    {userInfo ? (
+                    {user.userInfo ? (
                         <>
                             <Button
                                 aria-controls="simple-menu"
@@ -66,7 +66,7 @@ const Layout = ({children, title}) => {
                                 onClick={logoutClickHandler}
                                 className={classes.navbarButton}
                             >
-                                {userInfo.name}
+                                {user.userInfo.username}
                             </Button>
                         </>
                     ) : (

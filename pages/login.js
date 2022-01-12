@@ -10,6 +10,9 @@ import {useRouter} from "next/router";
 import {getError} from "../utils/error";
 import axios from "axios";
 import Cookies from 'js-cookie';
+import {useDispatch, useSelector} from "react-redux";
+import {loginUser} from "../redux";
+import {useEffect} from "react";
 
 const loginSchema = yup.object().shape({
     username: yup.string().required(),
@@ -22,13 +25,14 @@ const Login = () => {
     const router = useRouter();
     const {redirect} = router.query;
 
-/*    const {state, dispatch} = useContext(Store);
-    const {userInfo} = state;
+    const user = useSelector(state => state.user);
+    const dispatch = useDispatch();
+
     useEffect(() => {
-        if (userInfo) {
+        if (user.userInfo) {
             router.push('/');
         }
-    }, []);*/
+    }, []);
 
 
     const {register, handleSubmit, formState: {errors}} = useForm({
@@ -39,12 +43,12 @@ const Login = () => {
         closeSnackbar();
         try {
             const {data} = await axios.post('/api/users/login', {
-            ...formData
+                ...formData
             });
 
-            /*dispatch({type: 'USER_LOGIN', payload: data});*/
+            dispatch(loginUser(data));
             Cookies.set('userInfo', data);
-            router.push(redirect || '/');
+            await router.push(redirect || '/');
         } catch (error) {
             enqueueSnackbar(getError(error), {variant: 'error'});
         }

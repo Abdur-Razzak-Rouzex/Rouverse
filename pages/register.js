@@ -13,7 +13,10 @@ import {useRouter} from "next/router";
 import {getError} from "../utils/error";
 import axios from "axios";
 import Cookies from 'js-cookie';
-import {useReducer, useState} from "react";
+import {useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {loginUser} from "../redux";
+import {useEffect} from "react";
 
 const registerSchema = yup.object().shape({
     username: yup.string().required(),
@@ -32,13 +35,14 @@ const Register = () => {
     const [imageUrl, setImageUrl] = useState('');
     const [loadingUpload, setLoadingUpload] = useState(false);
 
-    /*    const {state, dispatch} = useContext(Store);
-        const {userInfo} = state;
+    const user = useSelector(state => state.user);
+    const dispatch = useDispatch();
+
         useEffect(() => {
-            if (userInfo) {
+            if (user.userInfo) {
                 router.push('/');
             }
-        }, []);*/
+        }, []);
 
     const uploadHandler = async (e, imageField = 'image') => {
         setLoadingUpload(true);
@@ -51,7 +55,7 @@ const Register = () => {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            console.log('data.secure_url: ', data.secure_url);
+
             setImageUrl(data.secure_url);
             setLoadingUpload(false);
             enqueueSnackbar('Profile picture uploaded successfully', {variant: 'success'});
@@ -76,9 +80,8 @@ const Register = () => {
                 }
             });
 
-            /*dispatch({type: 'USER_LOGIN', payload: data});*/
-            console.log('response data: ', data);
-            Cookies.set('userInfo', data);
+            dispatch(loginUser(data));
+            Cookies.set('user.userInfo', data);
             setIsSubmittingForm(false);
             await router.push(redirect || '/');
             reset();
