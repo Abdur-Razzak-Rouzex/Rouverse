@@ -13,12 +13,12 @@ import {useRouter} from "next/router";
 import {getError} from "../utils/error";
 import axios from "axios";
 import Cookies from 'js-cookie';
-import {useState} from "react";
+import {useReducer, useState} from "react";
 
 const registerSchema = yup.object().shape({
     username: yup.string().required(),
     fullName: yup.string().required().min(5),
-    imageName: yup.string().required(),
+    userImg: yup.string(),
     password: yup.string().min(2).required(),
     confirmPassword: yup.string().oneOf([yup.ref("password"), null]),
 })
@@ -29,8 +29,8 @@ const Register = () => {
     const router = useRouter();
     const {redirect} = router.query;
     const [isSubmittingForm, setIsSubmittingForm] = useState(false);
-    const [imageName, setImageName] = useState(null);
-    const [imageFormData, setImageFormData] = useState(null);
+    const [imageUrl, setImageUrl] = useState('');
+    const [loadingUpload, setLoadingUpload] = useState(false);
 
     /*    const {state, dispatch} = useContext(Store);
         const {userInfo} = state;
@@ -41,11 +41,25 @@ const Register = () => {
         }, []);*/
 
     const uploadHandler = async (e, imageField = 'image') => {
+        setLoadingUpload(true);
         const file = e.target.files[0];
-        setImageName(file.name);
         const bodyFormData = new FormData();
         bodyFormData.append('file', file);
-        setImageFormData(bodyFormData);
+        try {
+            const {data} = await axios.post('/api/users/upload', bodyFormData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            console.log('data.secure_url: ', data.secure_url);
+            setImageUrl(data.secure_url);
+            setLoadingUpload(false);
+            enqueueSnackbar('Profile picture uploaded successfully', {variant: 'success'});
+
+        } catch (error) {
+            setLoadingUpload(false);
+            enqueueSnackbar(getError(error), {variant: 'error'});
+        }
     }
 
     const {register, handleSubmit, formState: {errors}, reset} = useForm({
@@ -55,7 +69,6 @@ const Register = () => {
     const registerFormHandler = async (formData) => {
         setIsSubmittingForm(true);
         closeSnackbar();
-        formData.userImg = imageFormData;
         try {
             const {data} = await axios.post('/api/users/register', {...formData}, {
                 headers: {
@@ -64,9 +77,10 @@ const Register = () => {
             });
 
             /*dispatch({type: 'USER_LOGIN', payload: data});*/
+            console.log('response data: ', data);
             Cookies.set('userInfo', data);
             setIsSubmittingForm(false);
-            router.push(redirect || '/');
+            await router.push(redirect || '/');
             reset();
         } catch (error) {
             enqueueSnackbar(getError(error), {variant: 'error'});
@@ -104,22 +118,23 @@ const Register = () => {
                         />
                     </ListItem>
                     <ListItem style={{justifyContent: 'space-between'}}>
-                        <TextField
-                            value={imageName}
-                            error={!!errors.imageName}
+                        {imageUrl && <TextField
+                            value={imageUrl}
+                            error={!!errors.userImg}
                             variant="outlined"
-                            id="imageName"
+                            id="userImg"
                             label="Profile Picture"
-                            {...register("imageName")}
-                            helperText={errors.imageName?.message ?? null}
+                            {...register("userImg")}
+                            helperText={errors.userImg?.message ?? null}
                             InputProps={{
                                 readOnly: true,
                             }}
-                        />
+                        />}
                         <Button variant="contained" component="label" sx={{minWidth: 250}}>
                             Upload Profile Picture
                             <input type="file" onChange={uploadHandler} hidden accept="image/*"/>
                         </Button>
+                        {loadingUpload && <CircularProgress/>}
                     </ListItem>
                     <ListItem>
                         <TextField

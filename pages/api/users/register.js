@@ -3,19 +3,22 @@ import bcrypt from "bcryptjs";
 import User from "../../../models/User";
 import db from "../../../utils/db";
 import {signToken} from '../../../utils/auth';
+import {onError} from "../../../utils/error";
 
-const handler = nc();
-
-const userImage = '';
+const handler = nc({onError});
 
 handler.post(async (req, res) => {
     await db.connect();
+
+    const salt = await bcrypt.genSaltSync(10)
+    const body = JSON.parse(req.body);
+
     const newUser = new User({
-        username: req.body.username,
-        fullName: req.bdoy.fullName,
-        password: bcrypt.hashSync(req.body.password),
+        username: body.username,
+        fullName: body.fullName,
+        password: await bcrypt.hashSync(body.password, salt),
         isAdmin: false,
-        userImg: userImage
+        userImg: body.userImg
     });
 
     const user = await newUser.save();
@@ -27,7 +30,7 @@ handler.post(async (req, res) => {
         username: user.username,
         fullName: user.fullName,
         isAdmin: user.isAdmin,
-        userImage: user.userImage
+        userImg: user.userImg
     });
 });
 
