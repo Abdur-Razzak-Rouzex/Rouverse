@@ -1,5 +1,4 @@
-import React from 'react';
-import {makeStyles} from '@material-ui/core/styles';
+import React, {useState} from 'react';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -12,10 +11,30 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import useStyles from "../utils/styles";
 import moment from "moment";
+import {useSelector} from "react-redux";
+import {useSnackbar} from "notistack";
+import {Box} from "@material-ui/core";
 
-const PostCard = ({post}) => {
+const PostCard = ({post, socket}) => {
     const classes = useStyles();
     const time = moment(post.createdAt);
+    const user = useSelector(state => state.user);
+    const {enqueueSnackbar} = useSnackbar();
+
+    const [liked, setLiked] = useState(false);
+
+    const handleNotification = (type) => {
+        if (user.userInfo) {
+            type === 1 && setLiked(true);
+            socket.emit("sendNotification", {
+                senderName: user?.userInfo?.username,
+                receiverName: post.username,
+                type,
+            });
+        }else {
+            enqueueSnackbar('Please login first', {variant: 'error'});
+        }
+    };
 
     return (
         <Card className={classes.root}>
@@ -25,7 +44,7 @@ const PostCard = ({post}) => {
                 }
 
                 title={post.fullName}
-                subheader={time.format("lll") + ' (' +time.fromNow() + ')'}
+                subheader={time.format("lll") + ' (' + time.fromNow() + ')'}
             />
             <span>{}</span>
             <CardMedia
@@ -39,9 +58,19 @@ const PostCard = ({post}) => {
                 </Typography>
             </CardContent>
             <CardActions disableSpacing>
-                <IconButton aria-label="add to favorites">
-                    <FavoriteIcon/>
-                </IconButton>
+                {liked ? (
+                    <Box>
+                        <IconButton aria-label="add to favorites">
+                            <FavoriteIcon color='secondary' />
+                        </IconButton>
+                    </Box>
+                ): (
+                    <Box onClick={() => handleNotification(1)}>
+                        <IconButton aria-label="add to favorites">
+                            <FavoriteIcon />
+                        </IconButton>
+                    </Box>
+                )}
                 {post.totalLikes}
                 <IconButton aria-label="share">
                     <ShareIcon/>

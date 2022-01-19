@@ -47,7 +47,7 @@ const Login = () => {
             });
 
             dispatch(loginUser(data));
-            Cookies.set('userInfo', data);
+            Cookies.set('userInfo', JSON.stringify(data));
             await router.push(redirect || '/');
         } catch (error) {
             enqueueSnackbar(getError(error), {variant: 'error'});

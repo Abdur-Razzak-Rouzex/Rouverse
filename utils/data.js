@@ -23,15 +23,15 @@ const data = {
     ],
     users: [
         {
-            username: 'rouzex',
-            fullName: 'admin@example.com',
+            username: 'john',
+            fullName: 'John Keller',
             password: bcrypt.hashSync('123456'),
             userImg: 'https://images.pexels.com/photos/762020/pexels-photo-762020.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500',
             isAdmin: true,
         },
         {
-            username: 'Jane',
-            fullName: 'user@example.com',
+            username: 'monica',
+            fullName: 'Monica Stan',
             password: bcrypt.hashSync('123456'),
             userImg: 'https://images.pexels.com/photos/1121796/pexels-photo-1121796.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
             isAdmin: false,

@@ -38,11 +38,11 @@ const Register = () => {
     const user = useSelector(state => state.user);
     const dispatch = useDispatch();
 
-        useEffect(() => {
-            if (user.userInfo) {
-                router.push('/');
-            }
-        }, []);
+    useEffect(() => {
+        if (user.userInfo) {
+            router.push('/');
+        }
+    }, []);
 
     const uploadHandler = async (e, imageField = 'image') => {
         setLoadingUpload(true);
@@ -81,7 +81,7 @@ const Register = () => {
             });
 
             dispatch(loginUser(data));
-            Cookies.set('user.userInfo', data);
+            Cookies.set('userInfo', JSON.stringify(data));
             setIsSubmittingForm(false);
             await router.push(redirect || '/');
             reset();
